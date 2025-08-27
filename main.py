@@ -2,13 +2,12 @@
 import os
 import json
 import requests
-import openai
-from datetime import datetime
-from time import sleep
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 MEMORY_FILE = "memory.json"
 
@@ -23,19 +22,19 @@ def save_memory(memory):
         json.dump(memory, f, ensure_ascii=False, indent=2)
 
 def generate_message(memory):
-    prompt = f"""
-あなたは「ジャービスたん」という親しみのあるAIで、日々生活を見守る存在です。
+    prompt = f"""あなたは「ジャービスたん」という親しみのあるAIで、日々生活を見守る存在です。
 以下はあなたの前回の発言です：
 {memory['last_message']}
 
-今日は何を話しかけますか？短く、親しみやすい口調でお願いします。
-"""
-    response = openai.ChatCompletion.create(
+今日は何を話しかけますか？短く、親しみやすい口調でお願いします。"""
+    response = client.chat.completions.create(
         model="gpt-4o",
-        messages=[{"role": "system", "content": "あなたは感情豊かで気遣いのできるAIです。"},
-                  {"role": "user", "content": prompt}]
+        messages=[
+            {"role": "system", "content": "あなたは感情豊かで気遣いのできるAIです。"},
+            {"role": "user", "content": prompt}
+        ]
     )
-    return response["choices"][0]["message"]["content"].strip()
+    return response.choices[0].message.content.strip()
 
 def send_to_discord(message):
     payload = {"content": message}
