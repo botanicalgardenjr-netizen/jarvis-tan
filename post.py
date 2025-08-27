@@ -1,30 +1,38 @@
+# post.py
+
 import os
+import openai
 import requests
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
-DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-# 曜日によってメッセージ切り替え（任意）
-from datetime import datetime
-def generate_message():
-    weekday = datetime.now().weekday()
-    messages = [
-        "月曜日！今週もがんばろう💪",
-        "火曜日だよ。昨日どうだった？🌱",
-        "水曜日！折り返し地点だね✨",
-        "木曜日〜あと少し！🍵",
-        "金曜日！お疲れさま〜🎉",
-        "土曜日！何して過ごす？🏖️",
-        "日曜日…ゆっくり休もうね🛌"
-    ]
-    return messages[weekday]
+openai.api_key = OPENAI_API_KEY
 
-data = {
-    "content": generate_message()
+weekday_texts = {
+    0: "月曜日だよ！今週もがんばろ〜💪",
+    1: "火曜日！ちょっと慣れてきた？🐢",
+    2: "水曜日のジャービスたん🌊半分だよ〜！",
+    3: "木曜日！もう少しで週末🌟",
+    4: "金曜日！週末直前！もうひとふんばり🔥",
+    5: "土曜日〜🎉 ゆっくりできてる？",
+    6: "日曜日😴 明日からの準備もぼちぼちね〜"
 }
 
-response = requests.post(DISCORD_WEBHOOK_URL, json=data)
+today = datetime.now().weekday()
+message = weekday_texts.get(today, "やっほー！今日も元気？🌞")
 
-print("送信完了" if response.status_code == 204 else f"失敗: {response.status_code}")
+payload = {
+    "content": message
+}
+
+response = requests.post(WEBHOOK_URL, json=payload)
+
+if response.status_code == 204:
+    print("送信成功！")
+else:
+    print(f"送信失敗: {response.status_code} - {response.text}")
