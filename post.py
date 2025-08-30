@@ -35,4 +35,26 @@ response = requests.post(WEBHOOK_URL, json=payload)
 if response.status_code == 204:
     print("送信成功！")
 else:
+
     print(f"送信失敗: {response.status_code} - {response.text}")
+
+"""
+Supabaseへデータ送信
+認証情報・メール・パスワードは.envから取得
+"""
+from supabase import create_client, Client
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+data = {
+    "sender_type": "jarvis",
+    "sender_id": "123e4567-e89b-12d3-a456-426614174000",  # 有効なUUID
+    "persona": "jarvis-core",
+    "content": [message]
+}
+
+res = supabase.table("memory_log").insert(data).execute()
+print(response)
