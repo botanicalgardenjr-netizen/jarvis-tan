@@ -15,6 +15,7 @@ JST = timezone(timedelta(hours=9))
 CONV_ID = "daily-report"        # Supabase上での会話IDタグ
 SENDER_TYPE = "jarvis"
 PERSONA = "jarvis-core"
+APP_VERSION = "2025.10.16-a"
 
 def get_env(name: str) -> str:
     v = os.getenv(name)
@@ -78,9 +79,9 @@ def health_head(): # type: ignore
 def root(): # type: ignore
     return {"service":"jarvis-chat","ok":True} # type: ignore
 
-APP_VERSION = "2025.10.16-a"
+
 @app.get("/version", include_in_schema=False) # type: ignore
-def version():
+def version(): # type: ignore
     return {"version": APP_VERSION}
 
 app.add_middleware( # type: ignore
@@ -100,4 +101,13 @@ def chat(req: RequestModel): # type: ignore
         logger.exception("chat failed")
         raise HTTPException(status_code=500, detail="internal_error") # type: ignore
 
+# ルート（トップページ）
+@app.get("/", include_in_schema=False) # type: ignore
+def root(): # type: ignore
+    return {"service": "jarvis-chat", "ok": True} # type: ignore
+
+# バージョン表示
+@app.get("/version", include_in_schema=False) # type: ignore
+def version():
+    return {"version": APP_VERSION}
 

@@ -16,6 +16,7 @@ JST = timezone(timedelta(hours=9))
 CONV_ID = "live-chat"
 SENDER_TYPE = "jarvis"
 PERSONA = "jarvis-core"
+APP_VERSION = "2025.10.16-a"
 
 # --- env ---
 SUPABASE_URL = os.environ["SUPABASE_URL"]
@@ -80,6 +81,17 @@ def chat(payload: ChatIn): # type: ignore
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
     return ChatOut(reply=reply, jst_time=now)
 
+
+# ルート（トップページ）
+@app.get("/", include_in_schema=False) # type: ignore
+def root(): # type: ignore
+    return {"service": "jarvis-chat", "ok": True} # type: ignore
+
+# バージョン表示
+@app.get("/version", include_in_schema=False) # type: ignore
+def version(): # type: ignore
+    return {"version": APP_VERSION}
+
 @app.get("/health", include_in_schema=False) # type: ignore
 def health_get():
     return {"ok": True}
@@ -92,7 +104,6 @@ def health_head(): # type: ignore
 def root(): # type: ignore
     return {"service": "jarvis-chat", "ok": True} # type: ignore
 
-APP_VERSION = "2025.10.16-a"
 @app.get("/version", include_in_schema=False) # type: ignore
 def version():
     return {"version": APP_VERSION}
@@ -113,4 +124,6 @@ def chat(req: RequestModel): # type: ignore
     except Exception:
         logger.exception("chat failed")
         raise HTTPException(status_code=500, detail="internal_error")
+
+
 
