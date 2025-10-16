@@ -6,6 +6,10 @@ from datetime import datetime, timedelta, timezone
 from supabase import create_client
 from openai import OpenAI
 from fastapi import Response # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+from pydantic import BaseModel
+import traceback, logging # type: ignore
+from fastapi import HTTPException, Response, Request # type: ignore
 
 JST = timezone(timedelta(hours=9))
 CONV_ID = "live-chat"
@@ -82,3 +86,30 @@ def health_get():
 @app.head("/health", include_in_schema=False) # type: ignore
 def health_head(): # type: ignore
     return Response(status_code=200) # type: ignore
+
+@app.get("/", include_in_schema=False) # type: ignore
+def root(): # type: ignore
+    return {"service": "jarvis-chat", "ok": True} # type: ignore
+
+APP_VERSION = "2025.10.16-a"
+@app.get("/version", include_in_schema=False) # type: ignore
+def version():
+    return {"version": APP_VERSION}
+
+app.add_middleware( # type: ignore
+    CORSMiddleware,
+    allow_origins=["https://botanicalgardenjr-netizen.github.io"],
+    allow_methods=["POST","GET","OPTIONS"],
+    allow_headers=["Content-Type","Authorization"],
+)
+
+logger = logging.getLogger("app")
+
+@app.post("/chat") # type: ignore
+def chat(req: RequestModel): # type: ignore
+    try:
+        ...
+    except Exception:
+        logger.exception("chat failed")
+        raise HTTPException(status_code=500, detail="internal_error")
+
