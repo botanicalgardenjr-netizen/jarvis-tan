@@ -57,3 +57,7 @@ if __name__ == "__main__":
     except Exception as e:
         print("[FATAL] Job failed:", repr(e), file=sys.stderr)
         sys.exit(2)
+        
+@app.get("/health")
+def health():
+    return {"ok": True}
