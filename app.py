@@ -73,3 +73,7 @@ def chat(payload: ChatIn):
 
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
     return ChatOut(reply=reply, jst_time=now)
+
+@app.get("/health")
+def health():
+    return {"ok": True}
