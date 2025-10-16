@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException # type: ignore
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
 import os
 from datetime import datetime, timedelta, timezone
 from supabase import create_client
 from openai import OpenAI
+from fastapi import Response # type: ignore
 
 JST = timezone(timedelta(hours=9))
 CONV_ID = "live-chat"
@@ -21,10 +22,10 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 oai = OpenAI(api_key=OPENAI_API_KEY)
 
 # --- app ---
-app = FastAPI(title="Jarvis Chat API")
+app = FastAPI(title="Jarvis Chat API") # type: ignore
 
 # CORS（必要に応じて許可元を絞ってOK）
-app.add_middleware(
+app.add_middleware( # type: ignore
     CORSMiddleware,
     allow_origins=["*"], allow_credentials=True,
     allow_methods=["*"], allow_headers=["*"],
@@ -38,7 +39,7 @@ class ChatOut(BaseModel):
     jst_time: str
 
 def log_row(speaker: str, text: str):
-    supabase.table("memory_log").insert({
+    supabase.table("memory_log").insert({ # type: ignore
         "user_id": USER_ID,
         "conversation_id": CONV_ID,
         "speaker": speaker,
@@ -48,7 +49,7 @@ def log_row(speaker: str, text: str):
         "persona": PERSONA if speaker=="bot" else "tori",
     }).execute()
 
-@app.post("/chat", response_model=ChatOut)
+@app.post("/chat", response_model=ChatOut) # type: ignore
 def chat(payload: ChatIn):
     user_text = payload.text.strip()
     if not user_text:
@@ -66,7 +67,7 @@ def chat(payload: ChatIn):
         ],
         temperature=0.6,
     )
-    reply = completion.choices[0].message.content.strip()
+    reply = completion.choices[0].message.content.strip() # type: ignore
 
     # 3) 返答を保存
     log_row("bot", reply)
@@ -74,6 +75,10 @@ def chat(payload: ChatIn):
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
     return ChatOut(reply=reply, jst_time=now)
 
-@app.get("/health")
-def health():
+@app.get("/health", include_in_schema=False) # type: ignore
+def health_get():
     return {"ok": True}
+
+@app.head("/health", include_in_schema=False) # type: ignore
+def health_head(): # type: ignore
+    return Response(status_code=200) # type: ignore

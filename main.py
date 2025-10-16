@@ -58,6 +58,13 @@ if __name__ == "__main__":
         print("[FATAL] Job failed:", repr(e), file=sys.stderr)
         sys.exit(2)
         
-@app.get("/health")
-def health():
+from fastapi import Response
+
+@app.get("/health", include_in_schema=False)
+def health_get():
     return {"ok": True}
+
+@app.head("/health", include_in_schema=False)
+def health_head():
+    return Response(status_code=200)
+
