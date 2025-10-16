@@ -1,7 +1,14 @@
+from http.client import HTTPException
 import os
 import sys
 from datetime import datetime, timedelta, timezone
 from supabase import create_client
+import app
+from fastapi import Response # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+import traceback, logging # type: ignore
+from fastapi import HTTPException, Response, Request # type: ignore
+
 
 # ===== Settings =====
 JST = timezone(timedelta(hours=9))
@@ -46,7 +53,7 @@ def main():
     }
 
     print(f"[INFO] Upserting daily report ({report_key}) ...")
-    res = client.table("memory_log").upsert(row, on_conflict="report_key").execute()
+    res = client.table("memory_log").upsert(row, on_conflict="report_key").execute() # type: ignore
     # res.data は upsertされた行（既存なら更新、なければ作成）
     print("[OK] Supabase upsert done:", res.data)
 
@@ -58,13 +65,39 @@ if __name__ == "__main__":
         print("[FATAL] Job failed:", repr(e), file=sys.stderr)
         sys.exit(2)
         
-from fastapi import Response
 
-@app.get("/health", include_in_schema=False)
+@app.get("/health", include_in_schema=False) # type: ignore
 def health_get():
     return {"ok": True}
 
-@app.head("/health", include_in_schema=False)
-def health_head():
-    return Response(status_code=200)
+@app.head("/health", include_in_schema=False) # type: ignore
+def health_head(): # type: ignore
+    return Response(status_code=200) # type: ignore
+
+@app.get("/", include_in_schema=False) # type: ignore
+def root(): # type: ignore
+    return {"service":"jarvis-chat","ok":True} # type: ignore
+
+APP_VERSION = "2025.10.16-a"
+@app.get("/version", include_in_schema=False) # type: ignore
+def version():
+    return {"version": APP_VERSION}
+
+app.add_middleware( # type: ignore
+    CORSMiddleware,
+    allow_origins=["https://botanicalgardenjr-netizen.github.io"],
+    allow_methods=["POST","GET","OPTIONS"],
+    allow_headers=["Content-Type","Authorization"],
+)
+
+logger = logging.getLogger("app")
+
+@app.post("/chat") # type: ignore
+def chat(req: RequestModel): # type: ignore
+    try:
+        ...
+    except Exception:
+        logger.exception("chat failed")
+        raise HTTPException(status_code=500, detail="internal_error") # type: ignore
+
 

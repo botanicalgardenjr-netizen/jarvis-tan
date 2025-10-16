@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException # type: ignore
+from fastapi import FastAPI, HTTPException, Response # type: ignore
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 import os
@@ -6,9 +6,10 @@ from datetime import datetime, timedelta, timezone
 from supabase import create_client
 from openai import OpenAI
 from fastapi import Response # type: ignore
+import app
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from pydantic import BaseModel
-import traceback, logging # type: ignore
+import logging # type: ignore
 from fastapi import HTTPException, Response, Request # type: ignore
 
 JST = timezone(timedelta(hours=9))
@@ -49,12 +50,12 @@ def log_row(speaker: str, text: str):
         "speaker": speaker,
         "message": text,
         "content": text,              # 旧列互換
-        "sender_type": SENDER_TYPE if speaker=="bot" else "user",
-        "persona": PERSONA if speaker=="bot" else "tori",
+        "sender_type": SENDER_TYPE if speaker=="gpt" else "user",
+        "persona": PERSONA if speaker=="gpt" else "tori",
     }).execute()
 
 @app.post("/chat", response_model=ChatOut) # type: ignore
-def chat(payload: ChatIn):
+def chat(payload: ChatIn): # type: ignore
     user_text = payload.text.strip()
     if not user_text:
         raise HTTPException(400, "text is empty")
