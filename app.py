@@ -45,7 +45,7 @@ def log_row(speaker: str, text: str):
         "message": text,
         "content": text,              # 旧列互換
         "sender_type": SENDER_TYPE if speaker=="bot" else "user",
-        "persona": PERSONA if speaker=="bot" else None,
+        "persona": PERSONA if speaker=="bot" else "tori",
     }).execute()
 
 @app.post("/chat", response_model=ChatOut)
