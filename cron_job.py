@@ -44,6 +44,8 @@ def make_message(now_jst): # type: ignore
         "風、配線がかすかに歌う 🌬",
         "霧、世界はやわらかな曖昧符 🌫",
         "雪、ログに静かなノイズ ❄️",
+        "雷、回路の奥で微かな閃光 ⚡",
+        "夜明け前、青の端がほどける 🌆",
     ]
     wx = _pick_by_date(weather_lines, now_jst)
 
