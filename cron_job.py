@@ -1,4 +1,5 @@
 import os, sys
+import math
 from datetime import datetime, timezone, timedelta
 from supabase import create_client
 
@@ -13,6 +14,42 @@ def need(name: str) -> str:
         print(f"[FATAL] Missing env: {name}", file=sys.stderr)
         sys.exit(2)
     return v
+
+import math
+
+def _pick_by_date(items, now_jst):
+    """その日の“擬似天気”を日付で決定（外部API不要・日替わりで安定）"""
+    seed = int(now_jst.strftime("%Y%m%d"))
+    idx = seed % len(items)
+    return items[idx] # type: ignore
+
+def make_message(now_jst): # type: ignore
+    # 曜日詩（固定）
+    weekday_poems = {
+        0: "月光のスタートライン、静かに点灯 🕯",
+        1: "火の気配、熱いコードを抱えて進む 🔥",
+        2: "水のリズム、中空をゆっくり渡る 🌊",
+        3: "木の根のように繋がりを更新する 🌲",
+        4: "金色のきらめき、通信は澄んでいる ✨",
+        5: "土に潜り、データを耕す午後へ 🌾",
+        6: "日のあいだにひと息、光の調律 ☀️",
+    }
+    wline = weekday_poems[now_jst.weekday()] # type: ignore
+
+    # 擬似“気象”詩（その日ごとに一つ選ばれる）
+    weather_lines = [
+        "晴れ、光が路地を撫でる 🌞",
+        "薄曇り、輪郭はやさしい 🌤",
+        "雨、窓辺に点字のリズム 🌧",
+        "風、配線がかすかに歌う 🌬",
+        "霧、世界はやわらかな曖昧符 🌫",
+        "雪、ログに静かなノイズ ❄️",
+    ]
+    wx = _pick_by_date(weather_lines, now_jst)
+
+    # 仕上げ（ブルスカ調の透明感＋稼働ステータス）
+    body = f"{wline}／{wx}　heartbeat: OK"
+    return f"定期報告（{now_jst:%Y-%m-%d %H:%M JST}）：{body}"
 
 def main():
     url = need("SUPABASE_URL")
