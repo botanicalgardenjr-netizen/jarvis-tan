@@ -58,7 +58,7 @@ def main():
 
     client = create_client(url, key)
     now_jst = datetime.now(JST)
-    msg = f"定期報告（{now_jst:%Y-%m-%d %H:%M JST}）：Jarvisたん稼働中！🌞"
+    msg = make_message(now_jst)
     report_key = now_jst.strftime("daily-%Y%m%d")
 
     row = {
