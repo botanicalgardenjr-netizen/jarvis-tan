@@ -6,6 +6,15 @@ from supabase import create_client
 from openai import OpenAI
 import os
 
+@app.post("/echo", include_in_schema=False)
+def echo(payload: ChatIn, x_api_key: str | None = Header(default=None, alias="X-API-KEY")):
+    require_api_key(x_api_key)
+    t = payload.text.strip()
+    if not t:
+        raise HTTPException(status_code=400, detail="text is empty")
+    return {"echo": t}
+
+
 # -----------------------------
 # Constants / Settings
 # -----------------------------
