@@ -121,4 +121,3 @@ def health_get():
 @app.head("/health", include_in_schema=False)
 def health_head():
     return Response(status_code=200)
-
