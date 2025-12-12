@@ -35,9 +35,7 @@ app = FastAPI(title="Jarvis Chat API")
 # CORS（必要に応じて origin を絞ってOK）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://あなたのgithubid.github.io",
-    ],
+    allow_origins=[],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -123,3 +121,4 @@ def health_get():
 @app.head("/health", include_in_schema=False)
 def health_head():
     return Response(status_code=200)
+
