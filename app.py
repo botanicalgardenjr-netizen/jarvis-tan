@@ -19,7 +19,7 @@ PERSONA_USER = "tori"
 
 # --- env ---
 SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ["SUPABASE_KEY"]
+SUPABASE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 USER_ID = os.environ["SUPABASE_USER_ID"]  # TODO: 将来はJWTから取得
 JARVIS_API_KEY = os.environ["JARVIS_API_KEY"]

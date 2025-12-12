@@ -31,7 +31,7 @@ def make_message(now_jst: datetime) -> str:
 def main():
     url = get_env("SUPABASE_URL")
     # サーバー専用（RLSバイパス）：公開厳禁
-    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or get_env("SUPABASE_KEY")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     user_id = get_env("SUPABASE_USER_ID")  # あなたのUUID
 
     client = create_client(url, key)
