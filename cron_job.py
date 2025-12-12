@@ -1,5 +1,6 @@
 import os, sys
 import math
+import requests
 from datetime import datetime, timezone, timedelta
 from supabase import create_client
 
@@ -53,6 +54,12 @@ def make_message(now_jst): # type: ignore
     body = f"{wline}／{wx}　heartbeat: OK"
     return f"定期報告（{now_jst:%Y-%m-%d %H:%M JST}）：{body}"
 
+
+def post_to_discord(webhook_url: str, message: str) -> None:
+    r = requests.post(webhook_url, json={"content": message}, timeout=10)
+    if r.status_code not in (200, 204):
+        print("[WARN] Discord post failed:", r.status_code, r.text)
+
 def main():
     url = need("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or need("SUPABASE_KEY")
@@ -78,6 +85,10 @@ def main():
     res = client.table("memory_log").upsert(row, on_conflict="report_key").execute()  # type: ignore
     print("[OK] Supabase upsert done:", res.data)
     print("[DONE] Jarvis daily job finished successfully.")
+
+    webhook = os.getenv("DISCORD_WEBHOOK_URL")
+    if webhook:
+        post_to_discord(webhook, msg)
 
 if __name__ == "__main__":
     main()

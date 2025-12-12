@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
@@ -22,6 +22,7 @@ SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ["SUPABASE_KEY"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 USER_ID = os.environ["SUPABASE_USER_ID"]  # TODO: 将来はJWTから取得
+JARVIS_API_KEY = os.environ["JARVIS_API_KEY"]
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 oai = OpenAI(api_key=OPENAI_API_KEY)
@@ -34,7 +35,9 @@ app = FastAPI(title="Jarvis Chat API")
 # CORS（必要に応じて origin を絞ってOK）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://あなたのgithubid.github.io",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -68,11 +71,16 @@ def log_row(speaker: str, text: str) -> None:
         "persona": PERSONA_BOT if speaker == "bot" else PERSONA_USER,
     }).execute()
 
+def require_api_key(x_api_key: str | None):
+    if x_api_key != JARVIS_API_KEY:
+        raise HTTPException(status_code=401, detail="invalid api key")
+
 # -----------------------------
 # Routes
 # -----------------------------
 @app.post("/chat", response_model=ChatOut)
-def chat(payload: ChatIn) -> ChatOut:
+def chat(payload: ChatIn, x_api_key: str | None = Header(default=None, alias="X-API-KEY")) -> ChatOut:
+    require_api_key(x_api_key)
     user_text = payload.text.strip()
     if not user_text:
         raise HTTPException(status_code=400, detail="text is empty")
@@ -84,7 +92,7 @@ def chat(payload: ChatIn) -> ChatOut:
     completion = oai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "あなたは親しみやすく、簡潔で、相手の気持ちを汲むアシスタントです。"},
+            {"role": "system", "content": "あなたは親しみやすく、感情豊かなアシスタントです。"},
             {"role": "user", "content": user_text},
         ],
         temperature=0.6,
