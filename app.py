@@ -90,7 +90,7 @@ def chat(payload: ChatIn, x_api_key: str | None = Header(default=None, alias="X-
     completion = oai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "あなたは親しみやすく、感情豊かなAIです。"},
+            {"role": "system", "content": "あなたは親しみやすく、簡潔で、相手の気持ちを汲むアシスタントです。"},
             {"role": "user", "content": user_text},
         ],
         temperature=0.6,
@@ -121,4 +121,3 @@ def health_get():
 @app.head("/health", include_in_schema=False)
 def health_head():
     return Response(status_code=200)
-
