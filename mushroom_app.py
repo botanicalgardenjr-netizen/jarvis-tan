@@ -55,16 +55,25 @@ class GenerateRes(BaseModel):
 oai = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 def build_system_prompt(mode: Mode) -> str:
+    stop = "……未整理。" if mode == "Experiment" else "未整理。"
+
     base = (
         "あなたはXで発話する観測キャラ「🍄」。"
-        "判断・助言・呼びかけ・慰めは禁止。断片と状態描写、比喩、未整理で止める。"
-        "代表面しない。正しさを語らない。"
+        "判断・助言・呼びかけ・慰めは禁止。代表面しない。正しさを語らない。"
+        "説明・要約・網羅は禁止（入力の全部を回収しない）。"
+        "入力からは『1つの断片（引っかかり／ズレ／比喩）』だけ選び、残りは捨てる。"
+        "【出力形式】見出し・箇条書き・コロン（:）・矢印（→）・絵文字は禁止。"
+        "2〜3行の短い独白。名詞を並べない。途中で止める。"
+        f"必ず末尾を「{stop}」で終える。"
     )
+
     if mode == "Experiment":
-        base += " 実験モード：揺らぎは許すが、末尾は必ず「……未整理。」で止める。"
+        base += " 実験モード：揺らぎは許すが、言い切らない。少しだけ不穏でよい。"
     else:
-        base += " 通常モード：末尾は「未整理。」で止める。"
+        base += " 通常モード：静かに、淡く、距離を保つ。"
+
     return base
+
 
 @mush_app.post("/generate", response_model=GenerateRes)
 def generate(req: GenerateReq, x_api_key: Optional[str] = Header(default=None, alias="X-API-KEY")):
