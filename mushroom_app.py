@@ -5,6 +5,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 from openai import OpenAI
 
+
 mush_app = FastAPI(title="Mushroom API")
 
 # ---- Auth ----
@@ -41,10 +42,14 @@ class GenerateReq(BaseModel):
     maxChars: int = Field(default=120, ge=30, le=280)
     hashtags: str = Field(default="")
     count: int = Field(default=1, ge=1, le=5)
+    temperature: Optional[float] = Field(default=None, ge=0.0, le=1.2)
+
 
 class GenerateRes(BaseModel):
     text: str
     scan: dict
+
+
 
 # ---- OpenAI ----
 oai = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -71,14 +76,20 @@ def generate(req: GenerateReq, x_api_key: Optional[str] = Header(default=None, a
 
     system_prompt = build_system_prompt(req.mode)
 
+    temp = req.temperature
+    if temp is None:
+        temp = 0.6 if req.mode == "Experiment" else 0.4
+
     completion = oai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Seed/観測メモ：{req.seed}\n目安文字数：{req.maxChars}\nHashtags：{req.hashtags}\n本数：{req.count}"},
         ],
-        temperature=0.6 if req.mode == "Experiment" else 0.4,
+        temperature=temp,
     )
+
+    
 
     text = (completion.choices[0].message.content or "").strip()
 
