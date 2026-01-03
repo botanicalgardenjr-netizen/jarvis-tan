@@ -5,7 +5,10 @@ from datetime import datetime, timedelta, timezone
 from supabase import create_client
 from openai import OpenAI
 from typing import Optional
+from mushroom_app import mush_app
+app.mount("/mushroom", mush_app)
 import os
+
 
 # -----------------------------
 # Constants / Settings
