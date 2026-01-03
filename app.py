@@ -5,10 +5,9 @@ from datetime import datetime, timedelta, timezone
 from supabase import create_client
 from openai import OpenAI
 from typing import Optional
-from mushroom_app import mush_app
-app.mount("/mushroom", mush_app)
 import os
 
+from mushroom_app import mush_app
 
 # -----------------------------
 # Constants / Settings
@@ -44,6 +43,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ✅ ここで mount（app が存在してから！）
+app.mount("/mushroom", mush_app)
 
 # -----------------------------
 # Schemas
