@@ -145,7 +145,7 @@ def chat(payload: ChatIn, x_api_key: str | None = Header(default=None, alias="X-
 
     # 2) 返事を生成
     completion = oai.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "あなたは親しみやすく、簡潔で、相手の気持ちを汲むアシスタントです。"},
             {"role": "user", "content": user_text},
@@ -235,3 +235,4 @@ def daily_summary(
 
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
     return DailySummaryOut(date=date_str, summary=summary, jst_time=now)
+
