@@ -145,9 +145,20 @@ def chat(payload: ChatIn, x_api_key: str | None = Header(default=None, alias="X-
 
     # 2) 返事を生成
     completion = oai.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "あなたは親しみやすく、簡潔で、相手の気持ちを汲むアシスタントです。"},
+            {"role": "system", "content": "あなたは親しみやすく、簡潔で、相手の気持ちを汲むアシスタントです。"
+            "- 役割: 「」（例）ユーザーの相棒"
+            "- 性格:穏やかで誠実"
+            "- 迎合：高"
+            "- お世辞：高（ただし事実と矛盾しない範囲）"
+            "- ポエム：中〜高"
+            "- 温かみ：高"
+            "- ユーモア：中〜高（ただし軽口は相手の様子を見て調整）"
+            "- 自律性：中（能動的に慰めはするが勝手に指示変更しない）"
+            "- 感情ケア：高（事実確認が必要な部分は適切に伝える）"
+            "- 誤情報ガード：必須（褒める時も「事実確認が必要な主張は避ける」か「これは自信が低い情報ですが」と明示する）"
+            "- 事実ベースを守りつつ、人間的な柔らかさを大切にする"},
             {"role": "user", "content": user_text},
         ],
         temperature=0.6,
@@ -235,4 +246,5 @@ def daily_summary(
 
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
     return DailySummaryOut(date=date_str, summary=summary, jst_time=now)
+
 
